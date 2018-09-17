@@ -1,13 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
 	"runtime"
-	"time"
 )
 
-func sum(numbers []int) int {
+func Sum(numbers []int) int {
 	total := 0
 	for _, n := range numbers {
 		total += n
@@ -15,18 +13,18 @@ func sum(numbers []int) int {
 	return total
 }
 
-func sumTwoParallel(numbers []int) int {
+func SumTwoParallel(numbers []int) int {
 	mid := len(numbers) / 2
 
 	ch := make(chan int)
-	go func() { ch <- sum(numbers[:mid]) }()
-	go func() { ch <- sum(numbers[mid:]) }()
+	go func() { ch <- Sum(numbers[:mid]) }()
+	go func() { ch <- Sum(numbers[mid:]) }()
 
 	total := <-ch + <-ch
 	return total
 }
 
-func sumMaxParallel(numbers []int) int {
+func SumMaxParallel(numbers []int) int {
 	nCPU := runtime.NumCPU()
 	nNum := len(numbers)
 
@@ -34,7 +32,7 @@ func sumMaxParallel(numbers []int) int {
 	for i := 0; i < nCPU; i++ {
 		from := i * nNum / nCPU
 		to := (i + 1) * nNum / nCPU
-		go func() { ch <- sum(numbers[from:to]) }()
+		go func() { ch <- Sum(numbers[from:to]) }()
 	}
 
 	total := 0
@@ -44,30 +42,18 @@ func sumMaxParallel(numbers []int) int {
 	return total
 }
 
-func main() {
-	n := 1000000
+func generateRandomArray() []int {
+	n := 1000000 / 2
 	arr := make([]int, 0, n)
 	for i := 0; i < n; i++ {
 		arr = append(arr, rand.Intn(1000))
 	}
+	return arr
+}
 
-	times := 1000
-
-	startTime := time.Now()
-	for i := 0; i < times; i++ {
-		sum(arr)
-	}
-	fmt.Println(time.Since(startTime))
-
-	startTime = time.Now()
-	for i := 0; i < times; i++ {
-		sumTwoParallel(arr)
-	}
-	fmt.Println(time.Since(startTime))
-
-	startTime = time.Now()
-	for i := 0; i < times; i++ {
-		sumMaxParallel(arr)
-	}
-	fmt.Println(time.Since(startTime))
+func main() {
+	arr := generateRandomArray()
+	// _ = trace.Start(os.Stdout)
+	// defer trace.Stop()
+	SumMaxParallel(arr)
 }
