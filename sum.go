@@ -43,7 +43,7 @@ func SumMaxParallel(numbers []int) int {
 }
 
 func generateRandomArray() []int {
-	n := 1000000 / 2
+	n := 1000000
 	arr := make([]int, 0, n)
 	for i := 0; i < n; i++ {
 		arr = append(arr, rand.Intn(1000))
